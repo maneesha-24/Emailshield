@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EmailShield — AI Email Risk Detection</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg-main: #f0f4ff;
+            --bg-card: #ffffff;
+            --bg-card2: #f7f9ff;
+            --border: rgba(99, 102, 241, 0.15);
+            --text-primary: #1e1b4b;
+            --text-secondary: #6366f1;
+            --text-muted: #94a3b8;
+            --accent: #6366f1;
+            --accent2: #818cf8;
+            --green: #10b981;
+            --orange: #f59e0b;
+            --red: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── Animated background ── */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(129, 140, 248, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(167, 139, 250, 0.04) 0%, transparent 60%);
+            animation: bgshift 12s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes bgshift {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(2%, 2%) rotate(3deg);
+            }
+        }
+
+        /* ── Header ── */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(240, 244, 255, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #6366f1, #818cf8);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+            animation: pulse-logo 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-logo {
+
+            0%,
+            100% {
+                box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 4px 24px rgba(99, 102, 241, 0.55);
+            }
+        }
+
+        .logo h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .logo-badge {
+            font-size: 0.72rem;
+            color: var(--accent);
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        /* ── Hero section ── */
+        .hero {
+            text-align: center;
+            padding: 3.5rem 1.5rem 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 20px;
+            padding: 5px 14px;
+            font-size: 0.78rem;
+            color: var(--accent);
+            font-weight: 500;
+            margin-bottom: 1.2rem;
+            animation: fadein 0.6s ease;
+        }
+
+        .hero h2 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.03em;
+            color: var(--text-primary);
+            margin-bottom: 0.8rem;
+            animation: fadein 0.7s ease;
+        }
+
+        .hero h2 span {
+            background: linear-gradient(135deg, #6366f1, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            max-width: 480px;
+            margin: 0 auto 2rem;
+            line-height: 1.65;
+            animation: fadein 0.8s ease;
+        }
+
+        /* ── Stats row ── */
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+            animation: fadein 0.9s ease;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-num {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        @keyframes fadein {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ── Container ── */
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 0 1.5rem 3rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── Card ── */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 24px rgba(99, 102, 241, 0.06);
+            transition: box-shadow 0.3s;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.1);
+        }
+
+        .card-title {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1.2rem;
+        }
+
+        /* ── Sample buttons ── */
+        .sample-label {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+        }
+
+        .sample-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.4rem;
+        }
+
+        .btn-sample {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: var(--bg-card2);
+            color: var(--text-primary);
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-sample:hover {
+            background: rgba(99, 102, 241, 0.08);
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-1px);
+        }
+
+        /* ── Textarea ── */
+        textarea {
+            width: 100%;
+            height: 200px;
+            background: var(--bg-card2);
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            color: var(--text-primary);
+            font-family: 'Inter', monospace;
+            font-size: 0.82rem;
+            padding: 1rem 1.2rem;
+            resize: vertical;
+            outline: none;
+            transition: border 0.2s, box-shadow 0.2s;
+            line-height: 1.6;
+        }
+
+        textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* ── Textarea actions ── */
+        .textarea-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 0.5rem;
+            gap: 0.5rem;
+        }
+
+        .btn-clear {
+            padding: 5px 14px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-muted);
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-clear:hover {
+            color: var(--red);
+            border-color: var(--red);
+        }
+
+        /* ── Divider ── */
+        .divider {
+            text-align: center;
+            color: var(--text-muted);
+            margin: 1rem 0;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* ── Upload area ── */
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 14px;
+            padding: 1.2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            background: var(--bg-card2);
+        }
+
+        .upload-area:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(99, 102, 241, 0.04);
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        #file-name {
+            margin-top: 0.4rem;
+            font-size: 0.78rem;
+            color: var(--accent);
+        }
+
+        /* ── Analyze button ── */
+        .btn-analyze {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #6366f1, #818cf8);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            margin-top: 1.2rem;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.01em;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+        }
+
+        .btn-analyze:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+        }
+
+        .btn-analyze:active {
+            transform: scale(0.99);
+        }
+
+        .btn-analyze:disabled {
+            background: #e2e8f0;
+            color: #94a3b8;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* ── Result card ── */
+        #result {
+            display: none;
+        }
+
+        .verdict-banner {
+            border-radius: 14px;
+            padding: 1.4rem 1.8rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            animation: slidein 0.4s ease;
+        }
+
+        @keyframes slidein {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .verdict-banner.red {
+            background: linear-gradient(135deg, #fff1f1, #fff5f5);
+            border: 1.5px solid #fca5a5;
+        }
+
+        .verdict-banner.orange {
+            background: linear-gradient(135deg, #fffbeb, #fef9ec);
+            border: 1.5px solid #fcd34d;
+        }
+
+        .verdict-banner.green {
+            background: linear-gradient(135deg, #f0fdf4, #f0fff7);
+            border: 1.5px solid #6ee7b7;
+        }
+
+        .verdict-icon {
+            font-size: 2.2rem;
+        }
+
+        .verdict-text h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+            letter-spacing: -0.02em;
+        }
+
+        .verdict-banner.red .verdict-text h3 {
+            color: #dc2626;
+        }
+
+        .verdict-banner.orange .verdict-text h3 {
+            color: #d97706;
+        }
+
+        .verdict-banner.green .verdict-text h3 {
+            color: #059669;
+        }
+
+        .verdict-text p {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+        }
+
+        /* ── Confidence bar ── */
+        .conf-label-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .conf-bar-wrap {
+            background: #e2e8f0;
+            border-radius: 20px;
+            height: 10px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .conf-bar {
+            height: 100%;
+            border-radius: 20px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        /* Gradient from green to red based on data-color */
+        .conf-bar[data-color="green"] {
+            background: linear-gradient(90deg, #10b981, #34d399);
+        }
+
+        .conf-bar[data-color="orange"] {
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        }
+
+        .conf-bar[data-color="red"] {
+            background: linear-gradient(90deg, #ef4444, #f87171);
+        }
+
+        /* ── Explanation box ── */
+        .explanation-box {
+            background: var(--bg-card2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.4rem 1.6rem;
+            font-size: 0.9rem;
+            line-height: 1.85;
+            color: #475569;
+            margin-bottom: 1.5rem;
+            white-space: pre-wrap;
+        }
+
+        /* ── Details grid ── */
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-item {
+            background: var(--bg-card2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.9rem 1.1rem;
+            transition: border-color 0.2s;
+        }
+
+        .detail-item:hover {
+            border-color: var(--accent2);
+        }
+
+        .detail-item .label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.35rem;
+            font-weight: 600;
+        }
+
+        .detail-item .value {
+            font-size: 0.88rem;
+            color: var(--text-primary);
+            word-break: break-word;
+            font-weight: 500;
+        }
+
+        /* ── Auth badges ── */
+        .auth-section-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+        }
+
+        .auth-row {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .badge.pass {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #6ee7b7;
+        }
+
+        .badge.fail {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .badge.warn {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fcd34d;
+        }
+
+        .badge.none {
+            background: #f1f5f9;
+            color: #94a3b8;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* ── History ── */
+        #history-section {
+            display: none;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .btn-clear-history {
+            padding: 5px 14px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-muted);
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-clear-history:hover {
+            color: var(--red);
+            border-color: var(--red);
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.84rem;
+        }
+
+        .history-table th {
+            text-align: left;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 0 0.8rem 0.8rem;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+        }
+
+        .history-table td {
+            padding: 0.75rem 0.8rem;
+            border-bottom: 1px solid var(--border);
+            color: #475569;
+            vertical-align: middle;
+        }
+
+        .history-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .history-table tr:hover td {
+            background: var(--bg-card2);
+        }
+
+        .verdict-pill {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .verdict-pill.red {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+        }
+
+        .verdict-pill.orange {
+            background: #fef3c7;
+            color: #d97706;
+            border: 1px solid #fcd34d;
+        }
+
+        .verdict-pill.green {
+            background: #d1fae5;
+            color: #059669;
+            border: 1px solid #6ee7b7;
+        }
+
+        /* ── Spinner ── */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ── Footer ── */
+        footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            padding: 2rem 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        footer strong {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* ── Floating orbs ── */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(60px);
+            pointer-events: none;
+            z-index: 0;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .orb1 {
+            width: 300px;
+            height: 300px;
+            background: rgba(99, 102, 241, 0.07);
+            top: 10%;
+            left: -5%;
+            animation-delay: 0s;
+        }
+
+        .orb2 {
+            width: 250px;
+            height: 250px;
+            background: rgba(167, 139, 250, 0.06);
+            top: 60%;
+            right: -5%;
+            animation-delay: 3s;
+        }
+
+        .orb3 {
+            width: 200px;
+            height: 200px;
+            background: rgba(129, 140, 248, 0.05);
+            bottom: 10%;
+            left: 40%;
+            animation-delay: 6s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 600px) {
+            .hero h2 {
+                font-size: 1.7rem;
+            }
+
+            .stats-row {
+                gap: 1rem;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Floating orbs -->
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <div class="logo-icon">🛡️</div>
+            <h1>EmailShield</h1>
+        </div>
+        <span class="logo-badge">AI-Powered Detection</span>
+    </header>
+
+    <!-- Hero -->
+    <div class="hero">
+        <div class="hero-tag">
+            🤖 BERT + SVM Ensemble
+        </div>
+        <h2>Detect <span>Email Threats</span><br />in Seconds</h2>
+        <p>Our AI scans your email for phishing, spoofing, scams and tells you exactly what's suspicious and why</p>
+
+        <div class="stats-row">
+            <div class="stat-item">
+                <div class="stat-num">70,423</div>
+                <div class="stat-label">Emails Trained On</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">99.5%</div>
+                <div class="stat-label">BERT F1 Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">&lt;1s</div>
+                <div class="stat-label">Detection Time</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main container -->
+    <div class="container">
+
+        <!-- Input card -->
+        <div class="card">
+            <div class="card-title">Analyze Email</div>
+
+            <div class="sample-label">Try a sample email:</div>
+            <div class="sample-row">
+                <button class="btn-sample" onclick="loadSample('bank_phishing')">
+                    🏦 Bank Aadhaar Request
+                </button>
+                <button class="btn-sample" onclick="loadSample('food_invoice')">
+                    🧾 Food Delivery Invoice
+                </button>
+                <button class="btn-sample" onclick="loadSample('new_year_offer')">
+                    🎉 New Year Offer
+                </button>
+                <button class="btn-sample" onclick="loadSample('lottery_scam')">
+                    🎰 Lottery Winning
+                </button>
+                <button class="btn-sample" onclick="loadSample('meeting_scheduled')">
+                    📅 Meeting Scheduled
+                </button>
+            </div>
+
+            <textarea id="email-text" placeholder="Paste raw email content here — including headers if available...
+
+Example:
+From: support@paypal.com
+Subject: Your account has been suspended
+..."></textarea>
+
+            <div class="textarea-actions">
+                <button class="btn-clear" onclick="clearEmail()">🗑 Clear</button>
+            </div>
+
+            <div class="divider">or upload a .eml / .txt file</div>
+
+            <div class="upload-area" onclick="document.getElementById('file-input').click()">
+                📎 Click to upload email file
+                <div id="file-name"></div>
+            </div>
+            <input type="file" id="file-input" accept=".eml,.txt,.msg" />
+
+            <button class="btn-analyze" id="analyze-btn" onclick="analyzeEmail()">
+                Analyze Email
+            </button>
+        </div>
+
+        <!-- Result card -->
+        <div class="card" id="result">
+            <div class="card-title">Analysis Result</div>
+
+            <div class="verdict-banner" id="verdict-banner">
+                <div class="verdict-icon" id="verdict-icon"></div>
+                <div class="verdict-text">
+                    <h3 id="verdict-text"></h3>
+                    <p id="verdict-sub"></p>
+                </div>
+            </div>
+
+            <div class="conf-label-row">
+                <span>Confidence Score</span>
+                <span id="conf-pct" style="font-weight:600;color:var(--text-primary)"></span>
+            </div>
+            <div class="conf-bar-wrap">
+                <div class="conf-bar" id="conf-bar" style="width:0%" data-color="green"></div>
+            </div>
+
+            <div class="explanation-box" id="explanation"></div>
+
+            <div class="details-grid">
+                <div class="detail-item">
+                    <div class="label">Sender</div>
+                    <div class="value" id="d-sender">—</div>
+                </div>
+                <div class="detail-item">
+                    <div class="label">Subject</div>
+                    <div class="value" id="d-subject">—</div>
+                </div>
+                <div class="detail-item">
+                    <div class="label">URLs detected</div>
+                    <div class="value" id="d-urls">—</div>
+                </div>
+                <div class="detail-item">
+                    <div class="label">Risk signals</div>
+                    <div class="value" id="d-urgent">—</div>
+                </div>
+                <div class="detail-item">
+                    <div class="label">Detection method</div>
+                    <div class="value" id="d-method">—</div>
+                </div>
+            </div>
+
+            <div class="auth-section-label">Email Authentication</div>
+            <div class="auth-row" id="auth-row"></div>
+        </div>
+
+        <!-- History card -->
+        <div class="card" id="history-section">
+            <div class="history-header">
+                <div class="card-title" style="margin:0">Analysis History</div>
+                <button class="btn-clear-history" onclick="clearHistory()">
+                    Clear History
+                </button>
+            </div>
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Sender</th>
+                        <th>Subject</th>
+                        <th>Verdict</th>
+                        <th>Confidence</th>
+                        <th>URLs</th>
+                    </tr>
+                </thead>
+                <tbody id="history-body"></tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <strong>EmailShield</strong> — AI Powered Email Risk Detection
+    </footer>
+
+    <script>
+        let analysisCount = 0;
+
+        async function loadSample(key) {
+            try {
+                const res = await fetch(`/sample/${key}`);
+                const data = await res.json();
+                if (data.content) {
+                    document.getElementById("email-text").value = data.content;
+                    document.getElementById("file-name").textContent = "";
+                }
+            } catch (e) { alert("Could not load sample."); }
+        }
+
+        function clearEmail() {
+            document.getElementById("email-text").value = "";
+            document.getElementById("file-name").textContent = "";
+            document.getElementById("result").style.display = "none";
+        }
+
+        function clearHistory() {
+            analysisCount = 0;
+            document.getElementById("history-body").innerHTML = "";
+            document.getElementById("history-section").style.display = "none";
+        }
+
+        document.getElementById("file-input")
+            .addEventListener("change", function () {
+                const file = this.files[0];
+                if (file) {
+                    document.getElementById("file-name").textContent = "📄 " + file.name;
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        document.getElementById("email-text").value = e.target.result;
+                    };
+                    reader.readAsText(file);
+                }
+            });
+
+        function getBadge(value, label) {
+            let cls = "none", display = "N/A";
+            if (value === "pass") { cls = "pass"; display = "PASS"; }
+            else if (value === "fail") { cls = "fail"; display = "FAIL"; }
+            else if (value === "softfail") { cls = "warn"; display = "SOFTFAIL"; }
+            return `<span class="badge ${cls}">${label}: ${display}</span>`;
+        }
+
+        function addToHistory(data) {
+            analysisCount++;
+            const row = document.createElement("tr");
+
+            const cellValues = [
+                analysisCount,
+                data.sender || "Unknown",
+                data.subject || "No subject",
+                null, // verdict pill handled separately
+                data.confidence + "%",
+                data.url_count
+            ];
+
+            cellValues.forEach((val, i) => {
+                const td = document.createElement("td");
+                if (i === 0) td.style.color = "var(--text-muted)";
+                if (i === 3) {
+                    const pill = document.createElement("span");
+                    pill.className = `verdict-pill ${data.verdict_color}`;
+                    pill.textContent = data.verdict;
+                    td.appendChild(pill);
+                } else {
+                    td.textContent = val;
+                }
+                row.appendChild(td);
+            });
+
+            const tbody = document.getElementById("history-body");
+            tbody.insertBefore(row, tbody.firstChild);
+            document.getElementById("history-section").style.display = "block";
+        }
+
+        async function analyzeEmail() {
+            const text = document.getElementById("email-text").value.trim();
+            if (!text) {
+                alert("Please paste an email or load a sample first.");
+                return;
+            }
+
+            const btn = document.getElementById("analyze-btn");
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Analyzing...';
+            document.getElementById("result").style.display = "none";
+
+            try {
+                const formData = new FormData();
+                formData.append("email_text", text);
+
+                const response = await fetch("/analyze", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await response.json();
+                if (data.error) { alert("Error: " + data.error); return; }
+
+                const color = data.verdict_color;
+
+                // Verdict banner
+                const banner = document.getElementById("verdict-banner");
+                banner.className = `verdict-banner ${color}`;
+
+                const icons = { red: "🚨", orange: "⚠️", green: "✅" };
+                document.getElementById("verdict-icon").textContent = icons[color];
+                document.getElementById("verdict-text").textContent = data.verdict;
+
+                const subs = {
+                    red: "Treat this email as dangerous. Do not click any links.",
+                    orange: "Exercise caution before taking any action.",
+                    green: "No significant threats detected. Stay cautious."
+                };
+                document.getElementById("verdict-sub").textContent = subs[color];
+
+                // Confidence bar with color
+                document.getElementById("conf-pct").textContent = data.confidence + "%";
+                const bar = document.getElementById("conf-bar");
+                bar.setAttribute("data-color", color);
+                setTimeout(() => { bar.style.width = data.confidence + "%"; }, 50);
+
+                // Explanation
+                document.getElementById("explanation").textContent = data.explanation;
+
+                // Details
+                document.getElementById("d-sender").textContent =
+                    data.sender || "Not found";
+                document.getElementById("d-subject").textContent =
+                    data.subject || "Not found";
+                document.getElementById("d-urls").textContent =
+                    data.url_count + " URL(s) detected";
+                document.getElementById("d-urgent").textContent =
+                    data.urgent_words.length > 0
+                        ? data.urgent_words.join(", ")
+                        : "None detected";
+                document.getElementById("d-method").textContent =
+                    data.method || "SVM";
+
+                // Auth badges
+                document.getElementById("auth-row").innerHTML =
+                    getBadge(data.spf, "SPF") +
+                    getBadge(data.dkim, "DKIM") +
+                    getBadge(data.dmarc, "DMARC");
+
+                // Show result
+                document.getElementById("result").style.display = "block";
+                document.getElementById("result").scrollIntoView(
+                    { behavior: "smooth" });
+
+                addToHistory(data);
+
+            } catch (err) {
+                alert("Something went wrong: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = "Analyze Email";
+            }
+        }
+    </script>
+</body>
+
+</html>

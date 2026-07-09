@@ -1,0 +1,14 @@
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+models/bert_phishing_model/
+models/lr_model.pkl
+models/rf_model.pkl
+data/
+.env
+.DS_Store
+.vscode/
+.ipynb_checkpoints/
