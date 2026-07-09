@@ -89,7 +89,7 @@ EmailShield/
 
 ## Results
 
-Full methodology and detailed results are in `EmailShield_detailreport_file.pdf`.
+Full methodology and detailed results are in `EmailShield_detailreport_file.pdf`. open directly or download.
 
 ---
 
